@@ -7,9 +7,13 @@
 //
 
 import SwiftUI
+import Combine
+import MyLibrary
 
 struct ContentView: View {
-   
+    
+    @ObservedObject var timer = TimeCounter()
+    
     let rTarget = Double.random(in: 0..<1)
     let gTarget = Double.random(in: 0..<1)
     let bTarget = Double.random(in: 0..<1)
@@ -18,12 +22,12 @@ struct ContentView: View {
     @State var bGuess: Double
     @State var showAlert = false
     
-     func computeScore() -> Int {
-      let rDiff = rGuess - rTarget
-      let gDiff = gGuess - gTarget
-      let bDiff = bGuess - bTarget
-      let diff = sqrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff)
-      return Int((1.0 - diff) * 100.0 + 0.5)
+    func computeScore() -> Int {
+        let rDiff = rGuess - rTarget
+        let gDiff = gGuess - gTarget
+        let bDiff = bGuess - bTarget
+        let diff = sqrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff)
+        return Int((1.0 - diff) * 100.0 + 0.5)
     }
     
     var body: some View {
@@ -33,37 +37,45 @@ struct ContentView: View {
                     Text("Swift UI Test")
                         .foregroundColor(Color.black).bold().padding()
                     HStack {
-                      VStack {
-                        Color(red: rTarget, green: gTarget, blue: bTarget)
-                        Text("Match this color")
-                      }
-                      VStack {
-                        Color(red: rGuess, green: gGuess, blue: bGuess)
-                        Text("R: \(Int(rGuess * 255.0))"
-                          + "  G: \(Int(gGuess * 255.0))"
-                          + "  B: \(Int(bGuess * 255.0))")
-                      }
+                        VStack {
+                            Color(red: rTarget, green: gTarget, blue: bTarget)
+                            Text("Match this color")
+                        }
+                        VStack {
+                            ZStack {
+                                Color(red: rGuess, green: gGuess, blue: bGuess)
+                                Text(String(timer.counter)).padding().background(Color.white).mask(Circle())
+                            }
+                            Text("R: \(Int(rGuess * 255.0))"
+                                + "  G: \(Int(gGuess * 255.0))"
+                                + "  B: \(Int(bGuess * 255.0))")
+                        }
                     }.padding()
                 }
-               
+                
                 CustomSlider(value: $rGuess, textColor: .red)
                 CustomSlider(value: $gGuess, textColor: .green)
                 CustomSlider(value: $bGuess, textColor: .blue)
-                Button(action: { self.showAlert = true }) {
-                                   Text("Hit me").frame(minWidth: 0, maxWidth: .infinity).padding()
-                               }.alert(isPresented: $showAlert) {
-                                 Alert(title: Text("Your Score"),
-                                       message: Text(String(computeScore())))
-                               }.padding()
+                Button(action: {
+                    
+                    self.showAlert = true
+                    self.timer.killTimer()
+                    
+                }) {
+                    Text("Hit me").frame(minWidth: 0, maxWidth: .infinity).padding()
+                }.alert(isPresented: $showAlert) {
+                    Alert(title: Text("Your Score"),
+                          message: Text(String(computeScore())))
+                }.padding()
             }
-           
+            
         }
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-       ContentView(rGuess: 0.4, gGuess: 0.2, bGuess: 0.1)
+        ContentView(rGuess: 0.4, gGuess: 0.2, bGuess: 0.1)
         
     }
 }
