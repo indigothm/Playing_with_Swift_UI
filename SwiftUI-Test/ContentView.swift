@@ -50,7 +50,7 @@ struct ContentView: View {
                 CustomSlider(value: $gGuess, textColor: .green)
                 CustomSlider(value: $bGuess, textColor: .blue)
                 Button(action: { self.showAlert = true }) {
-                                   Text("Hit me").accentColor(.white).frame(minWidth: 0, maxWidth: .infinity).padding().background(Color(.blue)).cornerRadius(40)
+                                   Text("Hit me").frame(minWidth: 0, maxWidth: .infinity).padding()
                                }.alert(isPresented: $showAlert) {
                                  Alert(title: Text("Your Score"),
                                        message: Text(String(computeScore())))
